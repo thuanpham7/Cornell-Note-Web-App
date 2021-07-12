@@ -1,3 +1,3 @@
 # Cornell-Note-Web-App
 
-https://immense-headland-63961.herokuapp.com/
+https://cornell-note.herokuapp.com/
