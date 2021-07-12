@@ -44,7 +44,7 @@ passport.deserializeUser(User.deserializeUser())
 app.use(passport.initialize());
 app.use(passport.session());
 
-const db = process.env.DB;
+const db = "mongodb+srv://thuanpham7:ThuanPhamEdisonCavani19072000@cluster0.fibt2.mongodb.net/userNote";
 const mongoConnect = mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true});
 
 // passport.use(new GoogleStrategy({
