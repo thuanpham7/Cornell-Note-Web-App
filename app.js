@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 
 const userSchema = require('./models/user');
@@ -47,18 +46,6 @@ app.use(passport.session());
 
 const db = process.env.DB;
 const mongoConnect = mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true});
-
-passport.use(new GoogleStrategy({
-    clientID: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://www.example.com/auth/google/subjects"
-  },
-  function(accessToken, refreshToken, profile, done) {
-       User.findOrCreate({ googleId: profile.id }, function (err, user) {
-         return done(err, user);
-       });
-  }
-));
 
 //Running app from routes
 
