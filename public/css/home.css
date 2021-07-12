@@ -1,0 +1,98 @@
+body {
+    text-align: center;
+}
+.title {
+    margin: 70px 0px;
+}
+
+a {
+    color: inherit;
+}
+
+.form-width {
+    margin: auto;
+    text-align: left;
+    width: 40%;
+}
+
+.subject-form {
+    width: 20rem;
+    max-width: 90%;
+    margin: auto;
+    display: block;
+}
+
+.subject-item {
+    width: 20rem;
+    max-width: 95%;
+    margin: 1rem;
+}
+
+.subject__title {
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.subject__date {
+    text-align: center;
+    color: #4d4d4d;
+    margin-bottom: 50px;
+}
+
+.subject__description {
+    text-align: center;
+}
+
+.card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: stretch;
+    margin-bottom: 40px;
+  }
+
+.card__header,
+.card__content {
+  color: black;
+  padding: 1rem;
+}
+
+.card__image {
+    width: 100%;
+  }
+  
+  .card__image img {
+    width: 100%;
+  }
+
+.card__header h1,
+.card__content h1,
+.card__content h2,
+.card__content p {
+  margin: 0;
+}
+
+.note-container {
+    background-color: #fff;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 50%;
+}
+
+.note-value {
+    border: 1px solid black;
+    color: black;
+    padding: 7px;
+    
+}
+
+@media (max-width: 1024px){
+    .form-width {
+        width: 70%;
+    }
+}

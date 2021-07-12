@@ -1,0 +1,106 @@
+.row>*{
+    padding: 0 !important;
+}
+
+.card {
+    margin: 0 !important;
+}
+
+a { text-decoration: none !important; } 
+
+.card-header {
+    text-align: center;
+    background-color: #b6effa !important;
+    border-color: #b6effa !important;
+}
+
+.title {
+    margin: 20px;
+    text-align: center;
+}
+
+.date {
+    text-align: right;
+}
+
+.insert {
+    height: 1000px;
+}
+
+.insert-sum {
+    height: 500px;
+}
+  
+html {
+  background-color: #E4E9FD;
+  background-image: -webkit-linear-gradient(65deg, #b6effa 50%, #E4E9FD 50%);
+  min-height: 1000px;
+  font-family: 'helvetica neue';
+}
+
+.highlights {
+  display: flex;
+  width: 100%;
+}
+
+h1 {
+  color: #fff;
+  padding: 10px;
+}
+
+.box {
+  max-width: 400px;
+  margin: 50px auto;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 5px 5px 15px -5px rgba(0, 0, 0, 0.3);
+}
+
+#heading {
+  background-color: #b6effa;
+  text-align: center;
+}
+
+.item {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+input:checked+p {
+  text-decoration: line-through;
+  text-decoration-color: #b6effa;
+}
+
+input[type="checkbox"] {
+  margin: 10px;
+}
+
+p {
+  margin: 10px;
+  padding: 5px;
+  font-size: 18px;
+  font-weight: 200;
+  color: #00204a;
+}
+
+input[type="text"] {
+  text-align: center;
+  height: 60px;
+  top: 10px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  font-weight: 200;
+  width: 100%;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  box-shadow: inset 0 -3px 0 0 #b6effa;
+}
+
