@@ -47,6 +47,18 @@ app.use(passport.session());
 const db = process.env.DB;
 const mongoConnect = mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true});
 
+// passport.use(new GoogleStrategy({
+//     clientID: process.env.CLIENT_ID,
+//     clientSecret: process.env.CLIENT_SECRET,
+//     callbackURL: "http://www.example.com/auth/google/subjects"
+//   },
+//   function(accessToken, refreshToken, profile, done) {
+//        User.findOrCreate({ googleId: profile.id }, function (err, user) {
+//          return done(err, user);
+//        });
+//   }
+// ));
+
 //Running app from routes
 
 app.get('/register', (req, res) => {
@@ -78,27 +90,45 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-    res.render('login');
+    res.render('login', {isFound: 1});
 })
 
-app.post('/login', (req, res) => {
+// app.post('/login', (req, res) => {
 
+    // const user = new User({
+    //     username: req.body.username,
+    //     password: req.body.password
+    // });
+
+//     req.login(user, (err) => {
+//         if (err != !user) {
+//             res.render('login', {isFound: 0});
+//         }
+//         else {
+//             passport.authenticate("local")(req, res, () => {
+//                 res.redirect('/');
+//             })
+            
+//         }
+        
+//     })
+// })
+
+app.post('/login', function(req, res, next) {
     const user = new User({
         username: req.body.username,
         password: req.body.password
     });
-
-    req.login(user, (err) => {
-        if (err) {
-            res.redirect('/login');
-        }
-        else {
-            passport.authenticate("local")(req, res, () => {
-                res.redirect('/');
-            })
-        }
-    })
-})
+    /* look at the 2nd parameter to the below call */
+    passport.authenticate('local', function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) { return res.render('login', {isFound: 0}); }
+      req.logIn(user, function(err) {
+        if (err) { return next(err); }
+            res.redirect('/');
+      });
+    })(req, res, next);
+  });
 
 app.get('/logout', (req, res) => {
     req.logout();

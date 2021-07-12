@@ -20,6 +20,12 @@
                             <label for="exampleFormControlTextarea1" class="form-label">Password</label>
                             <input type = "password" name = "password" class="form-control" id="exampleFormControlInput1">
                         </div>
+                        <% if (isFound == 0) { %>
+                            <div class = "not-found">
+                                <p style = "color: red">Username/Password is incorrect</p>
+                            </div>
+                        <% } %>
+                        
                         <button type = "submit" class = "btn btn-outline-info">Login</button>
                     </form>
             </div>
