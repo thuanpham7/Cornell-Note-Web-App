@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const userSchema = require('./models/user');
 
@@ -13,6 +13,7 @@ const userSchema = require('./models/user');
 var session = require('express-session');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
+const findOrCreate = require('mongoose-findorcreate')
 
 //Modules
 const subject = require('./routes/subject');
@@ -27,56 +28,80 @@ mongoose.set('useCreateIndex', true);
 
 //Setting up user session
 app.use(session({
-     secret: "This is a secret",
+     secret: process.env.SECRET,
      resave: false,
      saveUninitialized: false
 }));
 
 userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
 
 const User = mongoose.model('User', userSchema);
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser())
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+  });
+  
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+      done(err, user);
+    });
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-const db = "mongodb+srv://thuanpham7:ThuanPhamEdisonCavani19072000@cluster0.fibt2.mongodb.net/userNote";
-const mongoConnect = mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true});
 
-// passport.use(new GoogleStrategy({
-//     clientID: process.env.CLIENT_ID,
-//     clientSecret: process.env.CLIENT_SECRET,
-//     callbackURL: "http://www.example.com/auth/google/subjects"
-//   },
-//   function(accessToken, refreshToken, profile, done) {
-//        User.findOrCreate({ googleId: profile.id }, function (err, user) {
-//          return done(err, user);
-//        });
-//   }
-// ));
+//You might see the password in the commit but I will change it heheh
+const db = process.env.DB;
+
+const localDB = "mongodb://localhost:27017/subjectDB";
+mongoose.connect(localDB, {useNewUrlParser: true, useUnifiedTopology: true});
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/subjects"
+  },
+  function(accessToken, refreshToken, profile, done) {
+       User.findOrCreate({ googleID: profile.id, username: profile.displayName}, function (err, user) {
+         return done(err, user);
+       });
+  }
+));
 
 //Running app from routes
 
 app.get('/register', (req, res) => {
-    res.render('register');
+    res.render('register', {val: true});
 })
 
-app.post('/register', (req, res) => {
-    User.register({username: req.body.username}, req.body.password, (err, user) => {
-        if (err) {
-            console.log(err);
-            res.redirect('/register');
-        }
-        else {
-            passport.authenticate("local")(req,res, function() {
-                res.redirect('/');
-            })
-        }
-    })
+app.post('/register', async (req, res) => {
+
+    //sanitize
+    if (!req.body.username.match(/^[0-9a-z]+$/)){
+        res.render('register', {val: false});
+    }
+
+    const curUser = await User.findOne({username: req.body.username});
+    if (curUser != null){
+        res.render('register', {val: false})
+    }
+    else {
+        User.register({username: req.body.username}, req.body.password, (err, user) => {
+            if (err) {
+                console.log(err);
+                res.redirect('/register');
+            }
+            else {
+                passport.authenticate("local")(req,res, function() {
+                    res.redirect('/');
+                })
+            }
+        })
+    }
 })
 
 app.get('/', (req, res) => {
@@ -90,45 +115,51 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-    res.render('login', {isFound: 1});
+    res.render('login', {val: true});
 })
 
-// app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
 
-    // const user = new User({
-    //     username: req.body.username,
-    //     password: req.body.password
-    // });
-
-//     req.login(user, (err) => {
-//         if (err != !user) {
-//             res.render('login', {isFound: 0});
-//         }
-//         else {
-//             passport.authenticate("local")(req, res, () => {
-//                 res.redirect('/');
-//             })
-            
-//         }
-        
-//     })
-// })
-
-app.post('/login', function(req, res, next) {
     const user = new User({
         username: req.body.username,
         password: req.body.password
     });
-    /* look at the 2nd parameter to the below call */
-    passport.authenticate('local', function(err, user, info) {
-      if (err) { return next(err); }
-      if (!user) { return res.render('login', {isFound: 0}); }
-      req.logIn(user, function(err) {
-        if (err) { return next(err); }
-            res.redirect('/');
-      });
-    })(req, res, next);
-  });
+
+    //Sanitize user request
+    if (!user.username.match(/^[0-9a-z]+$/)){
+        res.render('login', {val: false});
+    }
+
+    else {
+        const curUser = await User.findOne({username: user.username});
+        if (curUser === null){
+            res.render('login', {val: false});
+            return;
+        }
+        req.login(user, (err) => {
+            if (err) {
+                res.redirect('/login');
+            }
+            else {
+                passport.authenticate("local")(req, res, () => {
+                    res.redirect('/');
+                })
+            }
+        })
+    }
+})
+
+//Google oath2.0
+app.get('/auth/google',
+  passport.authenticate('google', { scope:
+      [ 'email', 'profile' ] }
+));
+
+app.get('/auth/google/subjects',
+    passport.authenticate( 'google', {
+        successRedirect: '/',
+        failureRedirect: '/login'
+}));
 
 app.get('/logout', (req, res) => {
     req.logout();
